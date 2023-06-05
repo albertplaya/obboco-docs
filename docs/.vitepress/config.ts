@@ -8,10 +8,11 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: "Obboco.com", link: "https://obboco.com" },
       { text: "Home", link: "/" },
       { text: "Features", link: "/features" },
       { text: "Technical", link: "/technical/activities" },
+      { text: "Obboco.com", link: "https://obboco.com" },
+      { text: "Obboco App", link: "https://app.obboco.com" },
     ],
 
     sidebar: [
