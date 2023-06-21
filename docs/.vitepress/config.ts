@@ -1,5 +1,9 @@
-import { defineConfig } from "vitepress";
+import { defineConfig } from 'vitepress'
+import { SitemapStream } from 'sitemap'
+import { createWriteStream } from 'node:fs'
+import { resolve } from 'node:path'
 
+const links = []
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "Obboco - Documentation",
@@ -36,14 +40,28 @@ export default defineConfig({
           {
             text: "Technical",
             link: "/technical",
-            items: [
-              { text: "Activities", link: "/technical/activities" },
-            ],
+            items: [{ text: "Activities", link: "/technical/activities" }],
           },
         ],
       },
     ],
 
     socialLinks: [{ icon: "github", link: "https://github.com/obboco" }],
+  },
+  lastUpdated: true,
+  transformHtml: (_, id, { pageData }) => {
+    if (!/[\\/]404\.html$/.test(id))
+      links.push({
+        url: pageData.relativePath.replace(/\.md$/, '.html'),
+        lastmod: pageData.lastUpdated
+      })
+  },
+  buildEnd: async ({ outDir }) => {
+    const sitemap = new SitemapStream({ hostname: "https://docs.obboco.com/" });
+    const writeStream = createWriteStream(resolve(outDir, 'sitemap.xml'))
+    sitemap.pipe(writeStream)
+    links.forEach((link) => sitemap.write(link))
+    sitemap.end()
+    await new Promise((r) => writeStream.on('finish', r))
   },
 });
